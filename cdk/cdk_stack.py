@@ -9,9 +9,15 @@ class CdkStack(Stack):
 		super().__init__(scope, construct_id, **kwargs)
 		
 		current_ami = ec2.MachineImage.latest_amazon_linux()
-		
+
 		vpc = ec2.Vpc(self, "test_vpc", 
-			cidr = "10.0.0.0/16"
+			cidr = "10.0.0.0/16",
+			subnet_configuration = [ec2.SubnetConfiguration(
+				name = "test_subnet_private",
+				subnet_type = ec2.SubnetType.PRIVATE_ISOLATED,
+				cidr_mask = 24
+			)],
+			max_azs = 1
 			)
 		
 		security_group = ec2.SecurityGroup(self, "test_security_group",
