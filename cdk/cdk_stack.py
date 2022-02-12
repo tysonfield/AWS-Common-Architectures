@@ -37,5 +37,6 @@ class CdkStack(Stack):
 			machine_image = current_ami,
 			vpc = vpc,
 			security_group = security_group,
-			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PUBLIC).subnets)
+			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PUBLIC).subnets),
+			key_name = "test-instance-public"
 			)
