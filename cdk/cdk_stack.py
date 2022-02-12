@@ -30,6 +30,8 @@ class CdkStack(Stack):
 			allow_all_outbound = False
 			)
 		
+		security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
+		
 		instance = ec2.Instance(self, "test_instance",
 			instance_type = ec2.InstanceType("t3.small"),
 			machine_image = current_ami,
