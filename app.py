@@ -6,6 +6,7 @@ from cdk.cdk_stack import CdkStack
 
 
 app = cdk.App()
-CdkStack(app, "cdk")
+test_env = cdk.Environment(region = "ap-southeast-2")
+CdkStack(app, "cdk", env=test_env)
 
 app.synth()
