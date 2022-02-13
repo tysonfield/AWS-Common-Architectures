@@ -63,3 +63,14 @@ class CdkStack(Stack):
 
 		app_instance.connections.allow_from(web_instance, ec2.Port.tcp(22))
 		web_instance.connections.allow_to(app_instance, ec2.Port.tcp(22))
+
+		db_instance = rds.DatabaseInstance(self, "db_instance",
+			engine = rds.DatabaseInstanceEngine.mysql(version = rds.MysqlEngineVersion.VER_8_0),
+			vpc = vpc,
+			allocated_storage = 20,
+			database_name = "db",
+			instance_identifier = "db-instance",
+			instance_type = ec2.InstanceType("db.t2.micro"),
+			storage_encrypted = True,
+			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_ISOLATED).subnets)
+			)
