@@ -80,5 +80,5 @@ class CdkStack(Stack):
 
 		app_instance.connections.allow_from(web_instance, ec2.Port.tcp(22))
 		web_instance.connections.allow_to(app_instance, ec2.Port.tcp(22))
-		db_instance.connections.allow_from(app_instance, ec2.Port.tcp(22))
-		app_instance.connections.allow_to(db_instance, ec2.Port.tcp(22))	
+		db_instance.connections.allow_from(app_instance, ec2.Port.tcp(3306))
+		app_instance.connections.allow_to(db_instance, ec2.Port.tcp(3306))
