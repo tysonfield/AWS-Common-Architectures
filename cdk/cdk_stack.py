@@ -10,50 +10,50 @@ class CdkStack(Stack):
 		
 		current_ami = ec2.MachineImage.latest_amazon_linux()
 
-		vpc = ec2.Vpc(self, "test_vpc", 
+		vpc = ec2.Vpc(self, "vpc", 
 			cidr = "10.0.0.0/16",
 			subnet_configuration = [ec2.SubnetConfiguration(
-				name = "test_subnet_private",
+				name = "private_subnet",
 				subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT,
 				cidr_mask = 24
 			),
 			ec2.SubnetConfiguration(
-				name = "test_subnet_public",
+				name = "public_subnet",
 				subnet_type = ec2.SubnetType.PUBLIC,
 				cidr_mask = 24
 			)],
 			max_azs = 1
 			)
 		
-		security_group_public = ec2.SecurityGroup(self, "test_security_group_public",
+		web_security_group = ec2.SecurityGroup(self, "web_security_group",
 			vpc = vpc,
 			allow_all_outbound = False
 			)
 		
-		security_group_public.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
+		web_security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
 		
-		public_instance = ec2.Instance(self, "test_instance_public",
+		web_instance = ec2.Instance(self, "web_instance",
 			instance_type = ec2.InstanceType("t2.micro"),
 			machine_image = current_ami,
 			vpc = vpc,
-			security_group = security_group_public,
+			security_group = web_security_group,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PUBLIC).subnets),
-			key_name = "test-instance-public"
+			key_name = "web-instance"
 			)
 
-		security_group_private = ec2.SecurityGroup(self, "test_security_group_private",
+		app_security_group = ec2.SecurityGroup(self, "app_security_group",
 			vpc = vpc,
 			allow_all_outbound = False
 			)
 
-		private_instance = ec2.Instance(self, "test_instance_private",
+		app_instance = ec2.Instance(self, "app_instance",
 			instance_type = ec2.InstanceType("t2.micro"),
 			machine_image = current_ami,
 			vpc = vpc,
-			security_group = security_group_private,
+			security_group = app_security_group,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT).subnets),
-			key_name = "test-instance-private"
+			key_name = "app-instance"
 			)
 
-		private_instance.connections.allow_from(public_instance, ec2.Port.tcp(22))
-		public_instance.connections.allow_to(private_instance, ec2.Port.tcp(22))
+		app_instance.connections.allow_from(web_instance, ec2.Port.tcp(22))
+		web_instance.connections.allow_to(app_instance, ec2.Port.tcp(22))
