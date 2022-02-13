@@ -25,14 +25,14 @@ class CdkStack(Stack):
 			max_azs = 1
 			)
 		
-		security_group = ec2.SecurityGroup(self, "test_security_group",
+		security_group = ec2.SecurityGroup(self, "test_security_group_public",
 			vpc = vpc,
 			allow_all_outbound = False
 			)
 		
 		security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
 		
-		instance = ec2.Instance(self, "test_instance",
+		public_instance = ec2.Instance(self, "test_instance_public",
 			instance_type = ec2.InstanceType("t2.micro"),
 			machine_image = current_ami,
 			vpc = vpc,
