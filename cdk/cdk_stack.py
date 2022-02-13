@@ -37,6 +37,16 @@ class CdkStack(Stack):
 			)
 		
 		web_security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
+
+		app_security_group = ec2.SecurityGroup(self, "app_security_group",
+			vpc = vpc,
+			allow_all_outbound = False
+			)
+		
+		db_security_group = ec2.SecurityGroup(self, "db_security_group",
+			vpc = vpc,
+			allow_all_outbound = False
+			)
 		
 		web_instance = ec2.Instance(self, "web_instance",
 			instance_type = ec2.InstanceType("t2.micro"),
@@ -47,11 +57,6 @@ class CdkStack(Stack):
 			key_name = "web-instance"
 			)
 
-		app_security_group = ec2.SecurityGroup(self, "app_security_group",
-			vpc = vpc,
-			allow_all_outbound = False
-			)
-
 		app_instance = ec2.Instance(self, "app_instance",
 			instance_type = ec2.InstanceType("t2.micro"),
 			machine_image = current_ami,
@@ -59,10 +64,7 @@ class CdkStack(Stack):
 			security_group = app_security_group,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT).subnets),
 			key_name = "app-instance"
-			)
-
-		app_instance.connections.allow_from(web_instance, ec2.Port.tcp(22))
-		web_instance.connections.allow_to(app_instance, ec2.Port.tcp(22))
+			)	
 
 		db_instance = rds.DatabaseInstance(self, "db_instance",
 			engine = rds.DatabaseInstanceEngine.mysql(version = rds.MysqlEngineVersion.VER_8_0),
@@ -71,6 +73,12 @@ class CdkStack(Stack):
 			database_name = "db",
 			instance_identifier = "db-instance",
 			instance_type = ec2.InstanceType("db.t2.micro"),
+			security_groups = [db_security_group],
 			storage_encrypted = True,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_ISOLATED).subnets)
 			)
+
+		app_instance.connections.allow_from(web_instance, ec2.Port.tcp(22))
+		web_instance.connections.allow_to(app_instance, ec2.Port.tcp(22))
+		db_instance.connections.allow_from(app_instance, ec2.Port.tcp(22))
+		app_instance.connections.allow_to(db_instance, ec2.Port.tcp(22))	
