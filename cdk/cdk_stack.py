@@ -54,4 +54,6 @@ class CdkStack(Stack):
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT).subnets),
 			key_name = "test-instance-private"
 			)
-			
+
+		private_instance.connections.allow_from(public_instance, ec2.Port.tcp(22))
+		public_instance.connections.allow_to(private_instance, ec2.Port.tcp(22))
