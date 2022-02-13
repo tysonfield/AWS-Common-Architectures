@@ -25,18 +25,33 @@ class CdkStack(Stack):
 			max_azs = 1
 			)
 		
-		security_group = ec2.SecurityGroup(self, "test_security_group_public",
+		security_group_public = ec2.SecurityGroup(self, "test_security_group_public",
 			vpc = vpc,
 			allow_all_outbound = False
 			)
 		
-		security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
+		security_group_public.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
 		
 		public_instance = ec2.Instance(self, "test_instance_public",
 			instance_type = ec2.InstanceType("t2.micro"),
 			machine_image = current_ami,
 			vpc = vpc,
-			security_group = security_group,
+			security_group = security_group_public,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PUBLIC).subnets),
 			key_name = "test-instance-public"
 			)
+
+		security_group_private = ec2.SecurityGroup(self, "test_security_group_private",
+			vpc = vpc,
+			allow_all_outbound = False
+			)
+
+		private_instance = ec2.Instance(self, "test_instance_private",
+			instance_type = ec2.InstanceType("t2.micro"),
+			machine_image = current_ami,
+			vpc = vpc,
+			security_group = security_group_private,
+			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT).subnets),
+			key_name = "test-instance-private"
+			)
+			
