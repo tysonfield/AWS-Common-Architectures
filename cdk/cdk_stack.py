@@ -1,7 +1,8 @@
 from constructs import Construct
 from aws_cdk import (
 	Stack,
-	aws_ec2 as ec2
+	aws_ec2 as ec2,
+	aws_rds as rds
 	)
 
 class CdkStack(Stack):
@@ -13,7 +14,12 @@ class CdkStack(Stack):
 		vpc = ec2.Vpc(self, "vpc", 
 			cidr = "10.0.0.0/16",
 			subnet_configuration = [ec2.SubnetConfiguration(
-				name = "private_subnet",
+				name = "private_subnet_isolated",
+				subnet_type = ec2.SubnetType.PRIVATE_ISOLATED,
+				cidr_mask = 24
+			),
+			ec2.SubnetConfiguration(
+				name = "private_subnet_nat",
 				subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT,
 				cidr_mask = 24
 			),
