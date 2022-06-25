@@ -36,8 +36,6 @@ class CdkStack(Stack):
 			allow_all_outbound = False
 			)
 		
-		web_security_group.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
-
 		app_security_group = ec2.SecurityGroup(self, "app_security_group",
 			vpc = vpc,
 			allow_all_outbound = False
