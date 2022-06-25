@@ -70,7 +70,7 @@ class CdkStack(Stack):
 			allocated_storage = 20,
 			database_name = "db",
 			instance_identifier = "db-instance",
-			instance_type = ec2.InstanceType("db.t2.micro"),
+			instance_type = ec2.InstanceType("t2.micro"),
 			security_groups = [db_security_group],
 			storage_encrypted = True,
 			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_ISOLATED).subnets)
