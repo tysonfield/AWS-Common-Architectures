@@ -28,7 +28,7 @@ class CdkStack(Stack):
 				subnet_type = ec2.SubnetType.PUBLIC,
 				cidr_mask = 24
 			)],
-			max_azs = 1
+			max_azs = 2
 			)
 		
 		web_security_group = ec2.SecurityGroup(self, "web_security_group",
