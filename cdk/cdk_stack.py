@@ -60,7 +60,7 @@ class CdkStack(Stack):
 			machine_image = current_ami,
 			vpc = vpc,
 			security_group = app_security_group,
-			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT).subnets),
+			vpc_subnets = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_ISOLATED).subnets),
 			key_name = "app-instance"
 			)	
 
