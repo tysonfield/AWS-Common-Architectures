@@ -19,11 +19,6 @@ class CdkStack(Stack):
 				cidr_mask = 24
 			),
 			ec2.SubnetConfiguration(
-				name = "private_subnet_nat",
-				subnet_type = ec2.SubnetType.PRIVATE_WITH_NAT,
-				cidr_mask = 24
-			),
-			ec2.SubnetConfiguration(
 				name = "public_subnet",
 				subnet_type = ec2.SubnetType.PUBLIC,
 				cidr_mask = 24
