@@ -5,6 +5,13 @@ from aws_cdk import (
 	aws_rds as rds
 	)
 
+class privateNaclCidr(ec2.AclCidr):
+	def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+		super().__init__()
+		self.acl_cidr_config = kwargs
+	def to_cidr_config(self):
+		return self.acl_cidr_config
+
 class CdkStack(Stack):
 	def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
 		super().__init__(scope, construct_id, **kwargs)
@@ -26,6 +33,29 @@ class CdkStack(Stack):
 			max_azs = 2
 			)
 		
+		nacl_public = ec2.NetworkAcl(self, "nacl_public",
+			vpc = vpc,
+			network_acl_name = "nacl_public",
+			subnet_selection = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PUBLIC).subnets)
+		)
+
+		nacl_private = ec2.NetworkAcl(self, "nacl_private",
+			vpc = vpc,
+			network_acl_name = "nacl_private",
+			subnet_selection = ec2.SubnetSelection(subnets = vpc.select_subnets(subnet_type = ec2.SubnetType.PRIVATE_ISOLATED).subnets)
+		)
+
+		nacl_private_cidr = privateNaclCidr(self, "nacl_private_cidr",
+			cidrBlock = '10.0.0.0/16')
+
+		nacl_private.add_entry("nacl_private_allow_http_all",
+			cidr = nacl_private_cidr,
+			rule_number = 100,
+			traffic = ec2.AclTraffic.tcp_port(80),
+			direction = ec2.TrafficDirection.INGRESS,
+			rule_action = ec2.Action.ALLOW
+		)
+
 		web_security_group = ec2.SecurityGroup(self, "web_security_group",
 			vpc = vpc,
 			allow_all_outbound = False
