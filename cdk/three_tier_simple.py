@@ -12,7 +12,7 @@ class privateNaclCidr(ec2.AclCidr):
 	def to_cidr_config(self):
 		return self.acl_cidr_config
 
-class CdkStack(Stack):
+class ThreeTierSimple(Stack):
 	def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
 		super().__init__(scope, construct_id, **kwargs)
 		
